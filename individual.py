@@ -8,6 +8,5 @@ class Individual:
 
     def mutate(self):
         idx1, idx2 = random.randint(0, len(self.genome) - 1), random.randint(0, len(self.genome) - 1)
-        buf = self.genome[idx1]
-        self.genome[idx1] = self.genome[idx2]
-        self.genome[idx2] = buf
+        start, stop = min(idx1, idx2), max(idx1, idx2)
+        self.genome[start:stop].reverse()

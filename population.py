@@ -1,7 +1,6 @@
 import glob
 import os
 import random
-
 import numpy as np
 import tsplib95
 
@@ -77,7 +76,7 @@ class Population:
             self.parents.remove(parent1)
             parent2 = random.choice(self.parents)
             self.parents.remove(parent2)
-            if random.uniform(0, 1) < 0.6:
+            if random.uniform(0, 1) < 0.7:
                 offspring1, offspring2 = self.offspring(parent1, parent2)
                 self.population.append(offspring1)
                 self.population.append(offspring2)
@@ -85,49 +84,31 @@ class Population:
                 self.population.append(parent1)
                 self.population.append(parent2)
 
-    def offspring(self, parent_A, parent_B):
-        gen1 = int(random.random() * len(parent_A.genome))
-        gen2 = int(random.random() * len(parent_B.genome))
-        start_gen = min(gen1, gen2)
-        stop_gen = max(gen1, gen2)
-        part_A = parent_A.genome[start_gen:stop_gen]
-        part_B = parent_B.genome[start_gen:stop_gen]
-        map_A = dict(zip(part_B, part_A))
-        map_B = dict(zip(part_A, part_B))
-        parent_A.genome[start_gen:stop_gen] = part_B
-        parent_B.genome[start_gen:stop_gen] = part_A
-        if len(parent_B.genome) != len(set(parent_B.genome)):
-            duplicates = set([x for x in parent_B.genome if parent_B.genome.count(x) > 1])
-            for duplicate in duplicates:
-                idx = [i for i, x in enumerate(parent_B.genome) if
-                       x == duplicate and i not in range(start_gen, stop_gen)]
-                buf = duplicate
-                while True:
-                    new_value = map_B[buf]
-                    if new_value in map_B.keys():
-                        buf = new_value
-                    else:
-                        break
-                parent_B.genome[idx[0]] = new_value
+    def ox_crossover(self, parent_A, parent_B):
+        offspring_genome_A = len(self.all_cities) * [None]
+        offspring_genome_B = len(self.all_cities) * [None]
+        pkt1, pkt2 = int(random.random() * len(parent_A.genome)), int(random.random() * len(parent_A.genome))
+        start_gen, stop_gen = min(pkt1, pkt2), max(pkt1, pkt2)
+        offspring_genome_A[start_gen:stop_gen] = parent_A.genome[start_gen:stop_gen]
+        offspring_genome_B[start_gen:stop_gen] = parent_B.genome[start_gen:stop_gen]
 
-        if len(parent_A.genome) != len(set(parent_A.genome)):
-            duplicates = set([x for x in parent_A.genome if parent_A.genome.count(x) > 1])
-            for duplicate in duplicates:
-                idx = [i for i, x in enumerate(parent_A.genome) if
-                       x == duplicate and i not in range(start_gen, stop_gen)]
-                buf = duplicate
-                while True:
-                    new_value = map_A[buf]
-                    if new_value in map_A.keys():
-                        buf = new_value
-                    else:
-                        break
-                parent_A.genome[idx[0]] = new_value
+        parent_B_genome = list(filter(lambda a: a not in parent_A.genome[start_gen:stop_gen], parent_B.genome))
+        parent_A_genome = list(filter(lambda a: a not in parent_B.genome[start_gen:stop_gen], parent_A.genome))
+
+        offspring_genome_A[:start_gen] = parent_B_genome[:start_gen]
+        offspring_genome_A[stop_gen:] = parent_B_genome[start_gen:]
+        offspring_genome_B[:start_gen] = parent_A_genome[:start_gen]
+        offspring_genome_B[stop_gen:] = parent_A_genome[start_gen:]
+
+        return offspring_genome_A, offspring_genome_B
+
+    def offspring(self, parent_A, parent_B):
+        offspring_genome_A, offspring_genome_B = self.ox_crossover(parent_A, parent_B)
+        parent_A.genome = offspring_genome_A
+        parent_B.genome = offspring_genome_B
         if random.uniform(0, 1) < self.mutation_rate:
             parent_A.mutate()
         if random.uniform(0, 1) < self.mutation_rate:
             parent_B.mutate()
-        offspring1 = parent_A
-        offspring2 = parent_B
 
-        return offspring1, offspring2
+        return parent_A, parent_B
