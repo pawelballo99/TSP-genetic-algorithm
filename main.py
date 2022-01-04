@@ -1,9 +1,17 @@
+import sys
+
 from population import Population
 import matplotlib.pyplot as plt
+
+
+def on_close(event):
+    sys.exit()
+
 
 if __name__ == '__main__':
     plt.ion()
     fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.canvas.mpl_connect('close_event', on_close)
     iterations = 1000
     mutation_rate = 0.02
     nr_individuals = 500
