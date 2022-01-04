@@ -76,7 +76,7 @@ class Population:
             self.parents.remove(parent1)
             parent2 = random.choice(self.parents)
             self.parents.remove(parent2)
-            if random.uniform(0, 1) < 0.7:
+            if random.uniform(0, 1) < 0.75:
                 offspring1, offspring2 = self.offspring(parent1, parent2)
                 self.population.append(offspring1)
                 self.population.append(offspring2)
@@ -95,10 +95,10 @@ class Population:
         parent_B_genome = list(filter(lambda a: a not in parent_A.genome[start_gen:stop_gen], parent_B.genome))
         parent_A_genome = list(filter(lambda a: a not in parent_B.genome[start_gen:stop_gen], parent_A.genome))
 
-        offspring_genome_A[:start_gen] = parent_B_genome[:start_gen]
-        offspring_genome_A[stop_gen:] = parent_B_genome[start_gen:]
-        offspring_genome_B[:start_gen] = parent_A_genome[:start_gen]
-        offspring_genome_B[stop_gen:] = parent_A_genome[start_gen:]
+        offspring_genome_A[stop_gen:] = parent_B_genome[:(len(self.all_cities)-stop_gen)]
+        offspring_genome_A[:start_gen] = parent_B_genome[(len(self.all_cities)-stop_gen):]
+        offspring_genome_B[stop_gen:] = parent_A_genome[:(len(self.all_cities) - stop_gen)]
+        offspring_genome_B[:start_gen] = parent_A_genome[(len(self.all_cities) - stop_gen):]
 
         return offspring_genome_A, offspring_genome_B
 

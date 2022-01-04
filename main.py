@@ -5,8 +5,8 @@ if __name__ == '__main__':
     plt.ion()
     fig, (ax1, ax2) = plt.subplots(1, 2)
     iterations = 1000
-    mutation_rate = 0.05
-    nr_individuals = 1500
+    mutation_rate = 0.02
+    nr_individuals = 500
     pop = Population(2, mutation_rate, nr_individuals)
     for i in range(iterations):
         pop.fitness_calculation()
